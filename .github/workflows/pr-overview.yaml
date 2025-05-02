@@ -1,4 +1,7 @@
 name: Get overview of PR
+permissions:
+  pull-requests: write
+  issues: write
 on:
   pull_request:
     branches: ["master", "releases/**"]
