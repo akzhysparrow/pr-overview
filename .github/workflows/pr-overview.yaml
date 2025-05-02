@@ -2,8 +2,9 @@ name: Get overview of PR
 on:
   pull_request:
     branches: ["master", "releases/**"]
+  workflow_dispatch:
 jobs:
-  build:
+  get-pr-overview:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,17 +17,19 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const response = await fetch("https://twigs-upgrade-guide.netlify.app/api/get-diff", {
+            const response = await fetch("https://twigs-upgrade-guide.vercel.app/api/get-diff", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                "x-api-secret": process.env.DIFF_API_SECRET
+                "x-diff-secret-key": process.env.DIFF_API_SECRET
               },
               body: JSON.stringify({
-                repo: `${context.repo.owner}/${context.repo.name}`,
-                pr: `${context.payload.pull_request.number}`,
+                repo: `${context.repo.owner}/${context.repo.repo}`,
+                pr: `${context.issue.number}`,
               }),
             });
 
+            console.log(context.repo, context.repo.owner, context.repo.repo, context.issue.number);
             const data = await response.text();
-            console.log(data);
+        env:
+          DIFF_API_SECRET: ${{ secrets.DIFF_API_SECRET }}
