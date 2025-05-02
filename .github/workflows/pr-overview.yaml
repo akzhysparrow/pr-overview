@@ -1,0 +1,32 @@
+name: Get overview of PR
+on:
+  pull_request:
+    branches: ["master", "releases/**"]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Call external API
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const response = await fetch("https://twigs-upgrade-guide.netlify.app/api/get-diff", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "x-api-secret": process.env.DIFF_API_SECRET
+              },
+              body: JSON.stringify({
+                repo: `${context.repo.owner}/${context.repo.name}`,
+                pr: `${context.payload.pull_request.number}`,
+              }),
+            });
+
+            const data = await response.text();
+            console.log(data);
