@@ -31,5 +31,6 @@ jobs:
 
             console.log(context.repo, context.repo.owner, context.repo.repo, context.issue.number);
             const data = await response.text();
+            console.log(data);
         env:
           DIFF_API_SECRET: ${{ secrets.DIFF_API_SECRET }}
